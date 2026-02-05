@@ -77,7 +77,6 @@ async function lookUpProvince(cityName = "Enschede") {
   }
 }
 
-
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
