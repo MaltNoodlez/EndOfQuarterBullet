@@ -81,7 +81,7 @@ app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
 
-app.get('/getTrain', async (req, res) => {
+app.post('/getTrain', async (req, res) => {
     const {city}=req.body
     try {
         const data = await getStations(city);
@@ -103,7 +103,7 @@ app.get('/getCatFact', async (req, res) => {
     }
 });
 
-app.get('/radio', async (req, res) => {
+app.post('/radio', async (req, res) => {
     const {city}=req.body
     try {
         const currentProvince = await lookUpProvince(city);
