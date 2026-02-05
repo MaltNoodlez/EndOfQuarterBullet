@@ -5,10 +5,12 @@ const destination = 'Amsterdam'
 
 
 <template>
-    <div class="app-header">
-        <img src=" @/logos/ns_logo.png" />
-        <h1>IC Direct to {{ destination }}</h1>
-    </div>
+    <header>
+        <div class="app-header">
+            <img src=" @/logos/ns_logo.png" />
+            <h1>IC Direct to {{ destination }}</h1>
+        </div>
+    </header>
 </template>
 
 <style>

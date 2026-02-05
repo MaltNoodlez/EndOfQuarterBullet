@@ -5,10 +5,10 @@
 <template>
 
   <body>
-    <header>
+    <nav>
       <router-link to="/rotterdam"> Go to station</router-link>
-      <router-link to="/screen"> Go to station</router-link>
-    </header>
+      <router-link to="/screen"> Go to screen</router-link>
+    </nav>
 
     <main>
       <router-view />
