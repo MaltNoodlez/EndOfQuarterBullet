@@ -35,7 +35,7 @@ const fetchData = async () => {
         const response = await fetch('http://localhost:3000/getTrain', {
             method: 'POST',
             body: JSON.stringify({
-                city: currentStation.value,
+                station: currentStation.value,
             }),
         });
 
