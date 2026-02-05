@@ -25,6 +25,7 @@ const fetchData = async () => {
 }
 
 onMounted(fetchData)
+console.log(trains)
 </script>
 
 
