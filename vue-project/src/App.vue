@@ -10,14 +10,19 @@ const destination = 'Amsterdam'
       <div class="app-header">
         <img src=" @/logos/ns_logo.png" />
         <h1>IC Direct to {{ destination }}</h1>
+        <router-link to="/rotterdam"> Go to station</router-link>
       </div>
     </header>
+
     <main>
+      <router-view />
     </main>
   </body>
 </template>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
+
 body {
   background-color: #222222;
   margin: 0;
