@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 const streamUrl = ref('https://stream.radionl.fm/rnlfriesland')
 const currentStation = ref("Den Haag")
+const city = ref("Enschede")
 const departures =
     [
         {
@@ -29,13 +30,15 @@ const departures =
     ]
 
 const departuresResponse = ref()
-
 const fetchData = async () => {
     try {
         const response = await fetch('http://localhost:3000/getTrain/', {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
-                station: currentStation.value,
+                city: city.value,
             }),
         });
 
@@ -50,14 +53,16 @@ const fetchData = async () => {
         console.error('Error fetching data:', err);
     }
 };
-
-onMounted(() => {
-    fetchData();
-});
 </script>
 
 <template>
     <main>
+        <div>
+            <form @submit.prevent="fetchData">
+                <input v-model="city">
+                <button type="submit">Submit</button>
+            </form>
+        </div>
         <div class="wrapper">
             <div class="info">
                 <h2>Current location: {{ currentLocation }}</h2>

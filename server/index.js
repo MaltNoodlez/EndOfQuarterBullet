@@ -2,13 +2,9 @@ const express = require('express');
 const cors=require('cors')
 const app = express();
 const PORT = 3000;
-const { getLocalRadio } = require('./provinceRadio');
 require('dotenv').config();
 app.use(express.json());
-app.use(cors({
-    origin:"http:localhost:5173",
-    methods:["GET","POST","DELETE"]
-}))
+app.use(cors())
 
 const API = process.env.NS_API;
 const WORLD_API = process.env.STATE_API;
@@ -78,13 +74,15 @@ async function lookUpProvince(cityName) {
 }
 
 app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
+  console.log(`App listening on port ${PORT}  `);
 });
 
-app.get('/getTrain', async (req, res) => {
+app.post('/getTrain', async (req, res) => {
     const {city}=req.body
+    
     try {
         const data = await getStations(city);
+        console.log('error')
         console.log(data);
         res.status(200).json(data);
     } catch (error) {
@@ -103,7 +101,7 @@ app.get('/getCatFact', async (req, res) => {
     }
 });
 
-app.get('/radio', async (req, res) => {
+app.post('/radio', async (req, res) => {
     const {city}=req.body
     try {
         const currentProvince = await lookUpProvince(city);
