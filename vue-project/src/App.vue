@@ -1,4 +1,6 @@
 <script setup>
+import { ref } from "vue";
+const streamUrl = ref('https://stream.radionl.fm/rnlfriesland')
 
 </script>
 
@@ -9,6 +11,11 @@
       <router-link to="/rotterdam"> Go to station</router-link>
       <router-link to="/screen"> Go to screen</router-link>
     </nav>
+
+    <div class="radio-player">
+      <h2>Live radio: Omrop Fryslân</h2>
+      <audio ref="audioRef" controls autoplay :src="streamUrl"></audio>
+    </div>
 
     <main>
       <router-view />
