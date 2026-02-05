@@ -2,6 +2,8 @@
 import { ref } from 'vue';
 import contentSlot from '@/components/contentSlot.vue';
 import snake from '@/images/snake.jpeg'
+const streamUrl = ref('https://stream.radionl.fm/rnlfriesland')
+
 
 const content = ref(getContent())
 const route = [
@@ -67,6 +69,11 @@ function getContent() {
                     <img :src="content.source" />
                 </template>
             </content-slot>
+        </div>
+
+        <div class="radio-player">
+            <h2>Live radio: Omrop Fryslân</h2>
+            <audio ref="audioRef" controls autoplay :src="streamUrl"></audio>
         </div>
     </div>
 
