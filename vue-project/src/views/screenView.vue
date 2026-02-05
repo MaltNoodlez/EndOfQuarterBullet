@@ -1,8 +1,6 @@
 <script setup>
 
 import { ref } from 'vue';
-import contentSlot from '@/components/contentSlot.vue';
-import snake from '@/images/snake.jpeg'
 
 const content = ref(getContent())
 const route = [
@@ -25,14 +23,8 @@ const route = [
     }
 ]
 
-function getContent() {
-    const content = {
-        type: "img",
-        source: snake
-    }
-    return content
-}
 </script>
+
 
 
 <template>
