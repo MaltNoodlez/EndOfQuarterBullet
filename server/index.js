@@ -2,8 +2,8 @@ const express = require('express');
 const cors=require('cors')
 const app = express();
 const PORT = 3000;
-const { getLocalRadio } = require('./provinceRadio');
 require('dotenv').config();
+const API = process.env.NS_API || 'b9b6ca97eaff4e34abaa3843eebf8984';
 app.use(express.json());
 app.use(cors({
     origin:"http:localhost:5173",
@@ -78,13 +78,14 @@ async function lookUpProvince(cityName) {
 }
 
 app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
+  console.log(`App listening on port ${PORT}  `);
 });
 
 app.get('/getTrain', async (req, res) => {
     const {city}=req.body
     try {
-        const data = await getStations(city);
+        const data = await getStations();
+        console.log('error')
         console.log(data);
         res.status(200).json(data);
     } catch (error) {
