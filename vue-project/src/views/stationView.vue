@@ -91,7 +91,6 @@ h2 {
 }
 
 .departure-grid {
-
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     align-items: center;
