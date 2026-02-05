@@ -1,5 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
+const streamUrl = ref('https://stream.radionl.fm/rnlfriesland')
+const currentStation = ref("Den Haag")
 const city = ref("Enschede")
 
 
@@ -35,7 +37,7 @@ const fetchCatFact = async () => {
 
 const fetchData = async () => {
     try {
-        const response = await fetch('http://localhost:3000/getTrain', {
+        const response = await fetch('http://localhost:3000/getTrain/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -99,6 +101,11 @@ onMounted(()=>{
                     <div>{{ departure.track_arrival }}</div>
                 </div>
             </div>
+        </div>
+
+        <div class="radio-player">
+            <h2>Live radio: Omrop Fryslân</h2>
+            <audio ref="audioRef" controls autoplay :src="streamUrl"></audio>
         </div>
         <div v-if="catFacts.length" class="info departures">
             <h3>Cat facts 🐱</h3>
