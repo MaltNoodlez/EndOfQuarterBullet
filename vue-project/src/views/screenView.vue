@@ -1,35 +1,31 @@
 <script setup>
-import { ref } from 'vue';
-import contentSlot from '@/components/contentSlot.vue';
-import snake from '@/images/snake.jpeg'
+import { onMounted, ref } from 'vue'
 
-const content = ref(getContent())
-const route = [
-    {
-        "name": "Amsterdam",
-        "arrival_time": "12:04",
-        "arrival_track": "5"
-    },
+const trains = ref([])
 
-    {
-        "name": "Zwolle",
-        "arrival_time": "14:30",
-        "arrival_track": "8"
-    },
-
-    {
-        "name": "Arhem",
-        "arrival_time": "15:00",
-        "arrival_track": "6"
-    }
-]
-function getContent() {
-    const content = {
-        type: "img",
-        source: snake
-    }
-    return content
+const formatTime = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
+
+const fetchData = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/getTrain')
+    if (!response.ok) throw new Error('Network error')
+
+    const data = await response.json()
+    trains.value = data.payload.departures
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+onMounted(fetchData)
+console.log(trains)
 </script>
 
 
@@ -42,33 +38,27 @@ function getContent() {
         </div>
     </header>
 
+<div class="main-content">
+  <!-- LEFT: timeline -->
+  <div class="timeline">
+    <h2>Departures</h2>
 
-    <div class="main-content">
-        <!-- LEFT: timeline -->
-        <div class="timeline">
-            <div v-for="(stop, index) in route" :key="index" class="timeline-row">
-                <div class="dot"></div>
-
-                <div class="station-name">
-                    {{ stop.name }}
-                </div>
-
-                <div class="meta">
-                    <span class="time">{{ stop.arrival_time }}</span>
-                    <span class="track">Spoor {{ stop.arrival_track }}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- RIGHT: video -->
-        <div class="content">
-            <content-slot>
-                <template #content>
-                    <img :src="content.source" />
-                </template>
-            </content-slot>
-        </div>
+    <div v-for="(train, index) in trains" :key="index">
+      {{ train.direction }} —
+      {{ formatTime(train.plannedDateTime) }} —
+      {{ train.name }}
     </div>
+  </div>
+
+  <!-- RIGHT: video -->
+  <div class="content">
+    <content-slot>
+      <template #content>
+        {{ content?.value }}
+      </template>
+    </content-slot>
+  </div>
+</div>
 
 
 </template>
@@ -76,9 +66,6 @@ function getContent() {
 <style>
 body {
     color: white;
-    /* display: flex;
-    justify-content: center;
-    align-items: center; */
 }
 
 header {
@@ -177,3 +164,4 @@ p {
     height: auto;
 }
 </style>
+
