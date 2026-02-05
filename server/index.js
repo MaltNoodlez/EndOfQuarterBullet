@@ -2,7 +2,7 @@ const express = require('express');
 const cors=require('cors')
 const app = express();
 const PORT = 3000;
-const cors=require('cors')
+const { getLocalRadio } = require('./provinceRadio');
 require('dotenv').config();
 app.use(express.json());
 app.use(cors({
@@ -45,7 +45,7 @@ async function catFact() {
     return catData.data
 }
 
-async function lookUpProvince(cityName = "Enschede") {
+async function lookUpProvince(cityName = "Groningen") {
   const response = await fetch(
     `https://api.countrystatecity.in/v1/countries/${COUNTRY_ISO2}/states`,
     { headers: { 'X-CSCAPI-KEY': WORLD_API } }
@@ -95,7 +95,6 @@ app.get('/getTrain', async (req, res) => {
 app.get('/getCatFact', async (req, res) => {
     try {
         const catFactList = await catFact();
-        // console.log(catFactList);
         res.status(200).json(catFactList);
     } catch (error) {
         console.error(error);
@@ -106,7 +105,8 @@ app.get('/getCatFact', async (req, res) => {
 app.get('/radio', async (req, res) => {
     try {
         const currentProvince = await lookUpProvince();
-        console.log(currentProvince);
+        const localRadio = getLocalRadio(currentProvince['province'])
+        console.log(localRadio);
         res.status(200).json(currentProvince);
     } catch (error) {
         console.error(error);
