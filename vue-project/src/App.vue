@@ -15,7 +15,6 @@ const destination = 'Amsterdam'
     </header>
 
     <main>
-      <router-view />
     </main>
   </body>
 </template>
@@ -35,6 +34,7 @@ header {
   margin: 0;
   color: white;
   padding: 1em;
+  display: flex
 }
 
 p {
@@ -42,6 +42,10 @@ p {
 }
 
 .app-header {
+  display:flex;
+  gap: 50px;
   align-items: center;
 }
+
+
 </style>
