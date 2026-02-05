@@ -1,7 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
-const currentLocation = ref("Den Haag")
+const currentStation = ref("Den Haag")
 const departures =
     [
         {
@@ -28,6 +28,32 @@ const departures =
         },
     ]
 
+const departuresResponse = ref()
+
+const fetchData = async () => {
+    try {
+        const response = await fetch('http://localhost:3000/getTrain', {
+            method: 'POST',
+            body: JSON.stringify({
+                city: currentStation.value,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        departuresResponse.value = data;
+        console.log(data);
+    } catch (err) {
+        console.error('Error fetching data:', err);
+    }
+};
+
+onMounted(() => {
+    fetchData();
+});
 </script>
 
 <template>
