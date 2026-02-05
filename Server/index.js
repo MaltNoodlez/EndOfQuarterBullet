@@ -5,8 +5,9 @@ require('dotenv').config();
 const API = process.env.NS_API;
 app.use(express.json());
 
-const city_name = "Enschede";
+const city_name = "Schiphol";
 const url = `https://gateway.apiportal.ns.nl/reisinformatie-api/api/v2/stations?q=${city_name}&limit=1`;
+const catfact = `https://cat-fact.herokuapp.com/facts`
 
 async function getStations() {
   const response = await fetch(url, {
@@ -15,13 +16,23 @@ async function getStations() {
 
   const data = await response.json();
 
-  console.log(data.payload[0].namen);
-  return data.payload[0].namen;
+  console.log(data.payload[0]);
+  return data.payload[0].sporen;
 }
+
+async function catFact() {
+    const catFactResponse = await fetch(catfact)
+
+    // const catData = await catFactResponse.json();
+
+    console.log(catFactResponse);
+}
+
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
-
+  
+  catFact();
   getStations();
 });
 
