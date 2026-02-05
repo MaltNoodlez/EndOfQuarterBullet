@@ -17,7 +17,7 @@ const COUNTRY_ISO2 = "NL"
 const catfact = `https://meowfacts.herokuapp.com/?lang=eng&count=3`
 
 
-async function getStations(cityName = "Enschede") {
+async function getStations(cityName) {
     const cityInfoUrl = `https://gateway.apiportal.ns.nl/reisinformatie-api/api/v2/stations?q=${cityName}&limit=1`;
 
     const response = await fetch(cityInfoUrl, {
@@ -45,7 +45,7 @@ async function catFact() {
     return catData.data
 }
 
-async function lookUpProvince(cityName = "Groningen") {
+async function lookUpProvince(cityName) {
   const response = await fetch(
     `https://api.countrystatecity.in/v1/countries/${COUNTRY_ISO2}/states`,
     { headers: { 'X-CSCAPI-KEY': WORLD_API } }
@@ -82,8 +82,9 @@ app.listen(PORT, () => {
 });
 
 app.get('/getTrain', async (req, res) => {
+    const {city}=req.body
     try {
-        const data = await getStations();
+        const data = await getStations(city);
         console.log(data);
         res.status(200).json(data);
     } catch (error) {
@@ -103,8 +104,9 @@ app.get('/getCatFact', async (req, res) => {
 });
 
 app.get('/radio', async (req, res) => {
+    const {city}=req.body
     try {
-        const currentProvince = await lookUpProvince();
+        const currentProvince = await lookUpProvince(city);
         const localRadio = getLocalRadio(currentProvince['province'])
         console.log(localRadio);
         res.status(200).json(currentProvince);
