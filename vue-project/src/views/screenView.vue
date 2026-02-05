@@ -8,7 +8,7 @@ const destination = 'Amsterdam'
     <header>
         <div class="app-header">
             <img src=" @/logos/ns_logo.png" />
-            <h1>IC Direct to {{ destination }}</h1>
+            <h2>IC Direct to {{ destination }}</h2>
         </div>
     </header>
 </template>

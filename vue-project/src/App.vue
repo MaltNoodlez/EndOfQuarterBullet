@@ -1,5 +1,7 @@
 <script setup>
+const radioStations = [
 
+]
 </script>
 
 <template>
@@ -21,5 +23,13 @@ body {
   background-color: #222222;
   margin: 0;
   padding: 0;
+}
+
+h2 {
+  margin-bottom: 1rem;
+  color: #1e3a8a;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #1e3a8a;
+  padding-bottom: 0.3rem;
 }
 </style>
