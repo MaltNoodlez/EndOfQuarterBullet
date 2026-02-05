@@ -27,7 +27,6 @@ async function catFact() {
     console.log(catData.data[0]);
 }
 
-
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
   
