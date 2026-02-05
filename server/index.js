@@ -3,14 +3,18 @@ const cors=require('cors')
 const app = express();
 const PORT = 3000;
 require('dotenv').config();
-const API = process.env.NS_API;
 app.use(express.json());
 app.use(cors({
     origin:"http:localhost:5173",
     methods:["GET","POST","DELETE"]
 }))
 
+const API = process.env.NS_API;
+const WORLD_API = process.env.STATE_API;
+const COUNTRY_ISO2 = "NL"
+
 const catfact = `https://meowfacts.herokuapp.com/?lang=eng&count=3`
+
 
 async function getStations(cityName = "Enschede") {
     const cityInfoUrl = `https://gateway.apiportal.ns.nl/reisinformatie-api/api/v2/stations?q=${cityName}&limit=1`;
@@ -40,6 +44,39 @@ async function catFact() {
     return catData.data
 }
 
+async function lookUpProvince(cityName = "Enschede") {
+  const response = await fetch(
+    `https://api.countrystatecity.in/v1/countries/${COUNTRY_ISO2}/states`,
+    { headers: { 'X-CSCAPI-KEY': WORLD_API } }
+  );
+  const provinces = await response.json();
+
+  const cityPromises = provinces.map(async (province) => {
+    const res = await fetch(
+      `https://api.countrystatecity.in/v1/countries/${COUNTRY_ISO2}/states/${province.iso2}/cities`,
+      { headers: { 'X-CSCAPI-KEY': WORLD_API } }
+    );
+    const cities = await res.json();
+
+    const match = cities.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+    if (match) return province.name;
+    return null;
+  });
+
+  const results = await Promise.all(cityPromises);
+
+  const provinceFound = results.find(p => p !== null);
+
+  if (provinceFound) {
+    console.log({ city: cityName, province: provinceFound });
+    return { city: cityName, province: provinceFound };
+  } else {
+    console.log({ city: cityName, province: "Not Found in Database" });
+    return { city: cityName, province: "Not Found in Database" };
+  }
+}
+
+
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
@@ -63,5 +100,16 @@ app.get('/getCatFact', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch cat fact :( '});
+    }
+});
+
+app.get('/radio', async (req, res) => {
+    try {
+        const currentProvince = await lookUpProvince();
+        console.log(currentProvince);
+        res.status(200).json(currentProvince);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch province data'})
     }
 });
