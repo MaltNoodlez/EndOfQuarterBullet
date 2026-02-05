@@ -14,7 +14,7 @@ const destination = 'Amsterdam'
     </header>
     <main>
       <div class="travel-info">
-
+        <p>Amsterdam</p>
       </div>
     </main>
   </body>
@@ -45,4 +45,6 @@ p {
   gap: 50px;
   align-items: center;
 }
+
+
 </style>
