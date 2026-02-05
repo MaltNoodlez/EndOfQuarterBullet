@@ -3,12 +3,8 @@ const cors=require('cors')
 const app = express();
 const PORT = 3000;
 require('dotenv').config();
-const API = process.env.NS_API || 'b9b6ca97eaff4e34abaa3843eebf8984';
 app.use(express.json());
-app.use(cors({
-    origin:"http:localhost:5173",
-    methods:["GET","POST","DELETE"]
-}))
+app.use(cors())
 
 const API = process.env.NS_API;
 const WORLD_API = process.env.STATE_API;
@@ -83,8 +79,9 @@ app.listen(PORT, () => {
 
 app.post('/getTrain', async (req, res) => {
     const {city}=req.body
+    
     try {
-        const data = await getStations();
+        const data = await getStations(city);
         console.log('error')
         console.log(data);
         res.status(200).json(data);
