@@ -1,11 +1,25 @@
-<script setup></script>
+<script setup>
+
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+
+  <body>
+    <nav>
+      <router-link to="/rotterdam"> Go to station</router-link>
+      <router-link to="/screen"> Go to screen</router-link>
+    </nav>
+
+    <main>
+      <router-view />
+    </main>
+  </body>
 </template>
 
-<style scoped></style>
+<style>
+body {
+  background-color: #222222;
+  margin: 0;
+  padding: 0;
+}
+</style>
