@@ -2,6 +2,7 @@ const express = require('express');
 const cors=require('cors')
 const app = express();
 const PORT = 3000;
+const cors=require('cors')
 require('dotenv').config();
 app.use(express.json());
 app.use(cors({
@@ -95,7 +96,7 @@ app.get('/getTrain', async (req, res) => {
 app.get('/getCatFact', async (req, res) => {
     try {
         const catFactList = await catFact();
-        console.log(catFactList);
+        // console.log(catFactList);
         res.status(200).json(catFactList);
     } catch (error) {
         console.error(error);

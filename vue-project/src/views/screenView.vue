@@ -1,5 +1,8 @@
 <script setup>
 
+import { ref } from 'vue';
+
+const content = ref(getContent())
 const route = [
     {
         "name": "Amsterdam",
@@ -21,6 +24,7 @@ const route = [
 ]
 
 </script>
+
 
 
 <template>
@@ -50,8 +54,12 @@ const route = [
         </div>
 
         <!-- RIGHT: video -->
-        <div class="video-wrapper">
-            <video controls class="video"></video>
+        <div class="content">
+            <content-slot>
+                <template #content>
+                    <img :src="content.source" />
+                </template>
+            </content-slot>
         </div>
     </div>
 
