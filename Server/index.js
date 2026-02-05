@@ -7,7 +7,7 @@ app.use(express.json());
 
 const city_name = "Schiphol";
 const url = `https://gateway.apiportal.ns.nl/reisinformatie-api/api/v2/stations?q=${city_name}&limit=1`;
-const catfact = `https://cat-fact.herokuapp.com/facts`
+const catfact = `https://meowfacts.herokuapp.com/?lang=eng`
 
 async function getStations() {
   const response = await fetch(url, {
@@ -22,10 +22,9 @@ async function getStations() {
 
 async function catFact() {
     const catFactResponse = await fetch(catfact)
+    const catData = await catFactResponse.json();
 
-    // const catData = await catFactResponse.json();
-
-    console.log(catFactResponse);
+    console.log(catData.data[0]);
 }
 
 
