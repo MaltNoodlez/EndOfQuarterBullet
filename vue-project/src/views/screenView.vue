@@ -1,29 +1,27 @@
 <script setup>
+import { onMounted, ref } from 'vue'
 
-import { ref } from 'vue';
+const trains = ref([])
 
-const content = ref(getContent())
-const route = [
-    {
-        "name": "Amsterdam",
-        "arrival_time": "12:04",
-        "arrival_track": "5"
-    },
+const fetchData = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/getTrain')
+    if (!response.ok) throw new Error('Network error')
 
-    {
-        "name": "Zwolle",
-        "arrival_time": "14:30",
-        "arrival_track": "8"
-    },
+    const data = await response.json()
 
-    {
-        "name": "Arhem",
-        "arrival_time": "15:00",
-        "arrival_track": "6"
-    }
-]
+    
+    trains.value = data.payload.departures
+  } catch (err) {
+    console.error(err)
+  }
+}
 
+onMounted(() => {
+  fetchData()
+})
 </script>
+
 
 
 <template>
