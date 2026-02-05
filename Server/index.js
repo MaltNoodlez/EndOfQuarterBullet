@@ -1,41 +1,42 @@
 const express = require('express');
+const cors=require('cors')
 const app = express();
 const PORT = 3000;
 require('dotenv').config();
 const API = process.env.NS_API;
 app.use(express.json());
+app.use(cors({
+    origin:"http:localhost:5173",
+    methods:["GET","POST","DELETE"]
+}))
 
-let cityName = "Enschede";
-
-const cityInfoUrl = `https://gateway.apiportal.ns.nl/reisinformatie-api/api/v2/stations?q=${cityName}&limit=1`;
 const catfact = `https://meowfacts.herokuapp.com/?lang=eng&count=3`
 
-async function getStations() {
+async function getStations(cityName = "Enschede") {
+    const cityInfoUrl = `https://gateway.apiportal.ns.nl/reisinformatie-api/api/v2/stations?q=${cityName}&limit=1`;
 
-  const response = await fetch(cityInfoUrl, {
+    const response = await fetch(cityInfoUrl, {
     headers: { "Ocp-Apim-Subscription-Key": API }
-  });
-  const data = await response.json();
-  console.log(data.payload[0])
-  const cityCode = data.payload[0].UICCode;
+    });
+    const data = await response.json();
+    console.log(data.payload[0])
+    const cityCode = data.payload[0].UICCode;
 
-  const cityDeparturesUrl = `https://gateway.apiportal.ns.nl/reisinformatie-api/api/v2/departures?lang=en&uicCode=${cityCode}&maxJourneys=5`;
+    const cityDeparturesUrl = `https://gateway.apiportal.ns.nl/reisinformatie-api/api/v2/departures?lang=en&uicCode=${cityCode}&maxJourneys=5`;
 
-  const departures = await fetch(cityDeparturesUrl, {
+    const departures = await fetch(cityDeparturesUrl, {
     headers: { "Ocp-Apim-Subscription-Key": API }
-  });
+    });
 
-  const departureData = await departures.json();
-  console.log(departureData.payload.departures);
+    const departureData = await departures.json();
+    console.log(departureData.payload.departures);
 
-  return departureData;
+    return departureData;
 }
 
 async function catFact() {
     const catFactResponse = await fetch(catfact)
     const catData = await catFactResponse.json();
-
-    console.log(catData.data);
     return catData.data
 }
 
