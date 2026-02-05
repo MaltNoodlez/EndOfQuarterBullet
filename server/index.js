@@ -2,14 +2,18 @@ const express = require('express');
 const cors=require('cors')
 const app = express();
 const PORT = 3000;
+const cors=require('cors')
 require('dotenv').config();
 const API = process.env.NS_API;
 app.use(express.json());
 app.use(cors({
-    origin:"http:localhost:5173",
-    methods:["GET","POST","DELETE"]
-}))
+origin:"http://localhost:5173",
+methods:["GET","POST"]
+}
+))
+let cityName = "Enschede";
 
+const cityInfoUrl = `https://gateway.apiportal.ns.nl/reisinformatie-api/api/v2/stations?q=${cityName}&limit=1`;
 const catfact = `https://meowfacts.herokuapp.com/?lang=eng&count=3`
 
 async function getStations(cityName = "Enschede") {
@@ -58,7 +62,7 @@ app.get('/getTrain', async (req, res) => {
 app.get('/getCatFact', async (req, res) => {
     try {
         const catFactList = await catFact();
-        console.log(catFactList);
+        // console.log(catFactList);
         res.status(200).json(catFactList);
     } catch (error) {
         console.error(error);
