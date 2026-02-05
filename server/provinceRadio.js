@@ -3,7 +3,7 @@ const radioList = {
     'Drenthe': "RTV Drenthe",
     'Friesland': "Omroep Friesland",
     'Groningen': "RTV Noord",
-    'Flevoland': "Omroep Flevoland",
+    'Flevoland': "Omrop Flevoland",
     'North Holland': "Radio Noord-Holland",
     'South Holland': "Radio West",
     'Zeeland': "Radio Zeeland",

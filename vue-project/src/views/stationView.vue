@@ -1,34 +1,38 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-const currentStation = ref("Den Haag")
 const city = ref("Enschede")
-const departures =
-    [
-        {
-            "id": 1,
-            "name": "Amsterdam",
-            "departureTime": "2 mins",
-            "track_departure": "6",
-            "track_arrival": "3"
-        },
-        {
-            "id": 2,
-            "name": "Zwolle",
-            "departureTime": "2 mins",
-            "track_departure": "6",
-            "track_arrival": "3"
 
-        },
-        {
-            "id": 3,
-            "name": "Arnhem",
-            "departureTime": "2 mins",
-            "track_departure": "6",
-            "track_arrival": "3"
-        },
-    ]
 
-const departuresResponse = ref()
+function formatTime(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('nl-NL', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+
+const departuresResponse = ref([])
+
+const catFacts = ref([])
+
+const fetchCatFact = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/getCatFact')
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    catFacts.value = data
+    console.log('Cat facts:', data)
+
+  } catch (err) {
+    console.error('Error fetching cat fact:', err)
+  }
+}
+
 const fetchData = async () => {
     try {
         const response = await fetch('http://localhost:3000/getTrain', {
@@ -41,17 +45,24 @@ const fetchData = async () => {
             }),
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
         const data = await response.json();
-        departuresResponse.value = data;
-        console.log(data);
+
+        departuresResponse.value = data.payload.departures.map((d, index) => ({
+            id: index,
+            name: d.direction,
+            departureTime: formatTime(d.plannedDateTime),
+            track_departure: d.plannedTrack ?? '-',
+            track_arrival: d.actualTrack ?? '-'
+        }));
     } catch (err) {
         console.error('Error fetching data:', err);
     }
 };
+
+onMounted(()=>{
+    fetchData();
+    fetchCatFact();
+});
 </script>
 
 <template>
@@ -77,14 +88,25 @@ const fetchData = async () => {
                     <div> Arrival Track</div>
                 </div>
 
-                <div class="departure-grid row"
-                    v-for="{ id, name, departureTime, track_departure, track_arrival } in departures" :key="id">
-                    <div>{{ name }}</div>
-                    <div>{{ departureTime }}</div>
-                    <div> {{ track_departure }}</div>
-                    <div> {{ track_arrival }}</div>
+                <div
+                class="departure-grid row"
+                v-for="departure in departuresResponse"
+                :key="departure.id"
+                >
+                    <div>{{ departure.name }}</div>
+                    <div>{{ departure.departureTime }}</div>
+                    <div>{{ departure.track_departure }}</div>
+                    <div>{{ departure.track_arrival }}</div>
                 </div>
             </div>
+        </div>
+        <div v-if="catFacts.length" class="info departures">
+            <h3>Cat facts 🐱</h3>
+            <ul>
+                <li v-for="(fact, index) in catFacts" :key="index">
+                {{ fact }}
+                </li>
+            </ul>
         </div>
     </main>
 </template>
