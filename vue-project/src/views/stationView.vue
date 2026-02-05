@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-
 const currentStation = ref("Den Haag")
 const departures =
     [
