@@ -2,7 +2,6 @@
 import { onMounted, ref, computed } from 'vue'
 import { useContentRotator } from '@/composables/useContentRotator'
 import contentSlot from '@/components/contentSlot.vue'
-const streamUrl = ref('https://stream.radionl.fm/rnlfriesland')
 const trains = ref([])
 const catFact = ref("Loading cat fact...")
 import snake from '@/images/snake.jpeg'
@@ -12,7 +11,7 @@ const destination = "Amsterdam"
 
 const fetchCatFact = async () => {
     try {
-        const response = await fetch('http://localhost:3000/getCatFact')
+        const response = await fetch('http://localhost:3001/getCatFact')
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`)
@@ -63,9 +62,10 @@ const formatTime = (dateString) => {
 
 // const fetchData = async () => {
 //     try {
-//         const response = await fetch('http://localhost:3000/getTrain')
+//         const response = await fetch('http://localhost:3001/getTrain')
 //         if (!response.ok) throw new Error('Network error')
-import { onMounted, onUnmounted, ref } from 'vue'
+//     }
+// }
 
 /* ================= STATE ================= */
 const route = ref(null)
@@ -90,18 +90,18 @@ const handleStorageChange = (event) => {
 /* ================= FETCH RADIO ================= */
 const fetchRadio = async () => {
   try {
-    const response = await fetch('http://localhost:3000/radio', {
+    const response = await fetch('http://localhost:3001/radio', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ city: 'Enschede' })
-    })
+    });
 
-//         const data = await response.json()
-//         streamUrl.value = data.value
-//     } catch (err) {
-//         console.error('Error fetching radio:', err)
-//     }
-// }
+        const data = await response.json()
+        streamUrl.value = data.value
+    } catch (err) {
+        console.error('Error fetching radio:', err)
+    }
+}
 
 // /* ================= INIT ================= */
 onMounted(() => {
@@ -155,18 +155,18 @@ onUnmounted(() => {
           {{ station }}
         </div>
 
-        <!-- <div class="meta">
+        <div class="meta">
           <span class="time">
             {{ index === 0 ? route.departureTime : '' }}
           </span>
           <span class="track">
             {{ index === 0 ? 'Track ' + route.track : '' }}
           </span>
-        </div> -->
+        </div>
       </div>
     </div>
 
-    <div v-else class="no-route">
+    <div class="no-route">
       <p>👆 Click a destination on the station view to see the route</p>
     </div>
 

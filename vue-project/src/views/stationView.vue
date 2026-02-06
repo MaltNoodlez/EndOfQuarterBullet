@@ -75,17 +75,6 @@ const fetchData = async () => {
         const data = await response.json()
         console.log(data)
 
-    departuresResponse.value = data.payload.departures.map((d, index) => ({
-      id: index,
-      name: d.direction,
-      departureTime: formatTime(d.plannedDateTime),
-      track_departure: d.plannedTrack ?? '-',
-      track_arrival: d.actualTrack ?? '-',
-      routeStations: d.routeStations?.map(s => s.mediumName) ?? []
-    }))
-  } catch (err) {
-    console.error('Error fetching train data:', err)
-  }
         departuresResponse.value = data.payload.departures.map((d, index) => ({
             id: index,
             name: d.direction,
@@ -93,12 +82,11 @@ const fetchData = async () => {
             track_departure: d.plannedTrack ?? '-',
             track_arrival: d.actualTrack ?? '-',
 
-            // 👇 route stations extracted here
             routeStations: d.routeStations?.map(s => s.mediumName) ?? []
         }))
-    } catch (err) {
-        console.error('Error fetching train data:', err)
-    }
+  } catch (err) {
+    console.error('Error fetching train data:', err)
+  }
 }
 
 function handleSubmit() {
@@ -111,9 +99,6 @@ onMounted(() => {
     fetchData()
     fetchRadio()
 })
-const handleSubmit=()=>{
-    fetchData()
-}
 </script>
 
 <template>
@@ -150,7 +135,7 @@ const handleSubmit=()=>{
         </div>
 
         <div class="radio-player">
-            <h2>Live radio: Omrop Fryslân</h2>
+            <h2>Live radio</h2>
             <audio ref="audioRef" controls autoplay :src="streamUrl"></audio>
         </div>
     </main>
