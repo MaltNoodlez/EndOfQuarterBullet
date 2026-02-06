@@ -1,8 +1,9 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 // const streamUrl = ref('https://stream.radionl.fm/rnlfriesland')
 const currentStation = ref("Den Haag")
 const city = ref("Enschede")
+const audioRef = ref(null)
 
 
 function formatTime(dateString) {
@@ -21,7 +22,7 @@ function handleSubmit(){
 
 const departuresResponse = ref([])
 const catFacts = ref([])
-let streamUrl = ref("")
+const streamUrl = ref("")
 
 const fetchCatFact = async () => {
   try {
@@ -53,7 +54,9 @@ const fetchRadio = async () => {
         });
 
     const data = await response.json();
-    streamUrl = data.value;
+
+    streamUrl.value = data;
+    console.log(data)
     } catch(err) {
         console.log('Error fetching data:', err);
     }
@@ -84,6 +87,13 @@ const fetchData = async () => {
         console.error('Error fetching data:', err);
     }
 };
+
+watch(streamUrl, async () => {
+  if (audioRef.value) {
+    audioRef.value.load();
+    await audioRef.value.play().catch(() => {});
+  }
+});
 
 onMounted(()=>{
     fetchData();
@@ -129,7 +139,7 @@ onMounted(()=>{
         </div>
 
         <div class="radio-player">
-            <h2>Live radio: Omrop Fryslân</h2>
+            <h2>Local Live Radio</h2>
             <audio ref="audioRef" controls autoplay :src="streamUrl"></audio>
         </div>
         <div v-if="catFacts.length" class="info departures">

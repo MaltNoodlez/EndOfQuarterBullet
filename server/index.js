@@ -1,5 +1,6 @@
 const express = require('express');
 const cors= require('cors')
+const {getLocalRadio} = require('./provinceRadio')
 const app = express();
 const PORT = 3000;
 require('dotenv').config();
@@ -104,7 +105,6 @@ app.post('/radio', async (req, res) => {
     try {
         const currentProvince = await lookUpProvince(city);
         const localRadio = getLocalRadio(currentProvince['province'])
-        console.log(localRadio);
         res.status(200).json(localRadio);
     } catch (error) {
         console.error(error);
