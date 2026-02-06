@@ -8,7 +8,8 @@ const routes = [
   { path: '/start', component: StartView },
   { path: '/screen', component: screenView },
   { path: '/rotterdam', component: stationView },
-    { path: '/', component: GameView },
+  // { path: '/', component: GameView },
+    
 ]
 
 const router = createRouter({
