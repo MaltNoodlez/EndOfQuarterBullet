@@ -1,11 +1,12 @@
 import screenView from '@/views/screenView.vue'
 import stationView from '@/views/stationView.vue'
-
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   { path: '/screen', component: screenView },
-  { path: '/station', component: stationView },
+  { path: '/rotterdam', component: stationView },
+  // { path: '/', component: GameView },
+    
 ]
 
 const router = createRouter({

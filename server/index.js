@@ -1,12 +1,13 @@
 const express = require('express');
 const cors= require('cors')
+const {getLocalRadio} = require('./provinceRadio')
 const app = express();
 const PORT = 3000;
 require('dotenv').config();
 app.use(express.json());
 app.use(cors())
 
-const API = process.env.NS_API;
+const API = process.env.NS_API || 'b9b6ca97eaff4e34abaa3843eebf8984';
 const WORLD_API = process.env.STATE_API;
 const COUNTRY_ISO2 = "NL"
 
@@ -104,8 +105,7 @@ app.post('/radio', async (req, res) => {
     try {
         const currentProvince = await lookUpProvince(city);
         const localRadio = getLocalRadio(currentProvince['province'])
-        console.log(localRadio);
-        res.status(200).json(currentProvince);
+        res.status(200).json(localRadio);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch province data'})

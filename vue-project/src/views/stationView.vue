@@ -1,80 +1,105 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-const streamUrl = ref('https://stream.radionl.fm/rnlfriesland')
+import { onMounted, ref, watch } from 'vue'
+// const streamUrl = ref('https://stream.radionl.fm/rnlfriesland')
 const currentStation = ref("Den Haag")
 const city = ref("Enschede")
+const audioRef = ref(null)
 
-
+/* ================= HELPERS ================= */
 function formatTime(dateString) {
-  const date = new Date(dateString);
+  const date = new Date(dateString)
   return date.toLocaleTimeString('nl-NL', {
     hour: '2-digit',
     minute: '2-digit'
-  });
+  })
 }
 
+function handleSubmit(){
+    fetchData()
+    fetchRadio()
+}
 
+function displayRouteStations(stations) {
+  if (!stations || stations.length === 0) {
+    return 'No intermediate stops'
+  }
+  return stations.join(' → ')
+}
+
+/* ================= STATE ================= */
 const departuresResponse = ref([])
-
 const catFacts = ref([])
+const streamUrl = ref("")
 
-const fetchRadio = async () => {
-    
-}
-
+/* ================= FETCH CAT FACT ================= */
 const fetchCatFact = async () => {
   try {
     const response = await fetch('http://localhost:3000/getCatFact')
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    catFacts.value = data
-    console.log('Cat facts:', data)
-
+    if (!response.ok) throw new Error(response.status)
+    catFacts.value = await response.json()
   } catch (err) {
     console.error('Error fetching cat fact:', err)
   }
 }
 
-const fetchData = async () => {
-    try {
-        const response = await fetch('http://localhost:3000/getTrain/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                city: city.value,
-            }),
-        });
+/* ================= FETCH RADIO ================= */
+const fetchRadio = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/radio', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ city: city.value })
+    })
 
-        const data = await response.json();
+    const data = await response.json();
 
-        departuresResponse.value = data.payload.departures.map((d, index) => ({
-            id: index,
-            name: d.direction,
-            departureTime: formatTime(d.plannedDateTime),
-            track_departure: d.plannedTrack ?? '-',
-            track_arrival: d.actualTrack ?? '-'
-        }));
-    } catch (err) {
-        console.error('Error fetching data:', err);
+    streamUrl.value = data;
+    console.log(data)
+    } catch(err) {
+        console.log('Error fetching data:', err);
     }
-};
+}
 
-onMounted(()=>{
-    fetchData();
-    fetchCatFact();
-});
+/* ================= FETCH TRAIN DATA ================= */
+const fetchData = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/getTrain/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ city: city.value })
+    })
+
+    const data = await response.json()
+    console.log(data)
+
+    departuresResponse.value = data.payload.departures.map((d, index) => ({
+      id: index,
+      name: d.direction,
+      departureTime: formatTime(d.plannedDateTime),
+      track_departure: d.plannedTrack ?? '-',
+      track_arrival: d.actualTrack ?? '-',
+
+      // 👇 route stations extracted here
+      routeStations: d.routeStations?.map(s => s.mediumName) ?? []
+    }))
+  } catch (err) {
+    console.error('Error fetching train data:', err)
+  }
+}
+
+/* ================= INIT ================= */
+onMounted(() => {
+  fetchData()
+  fetchRadio()
+  fetchCatFact()
+})
 </script>
+
 
 <template>
     <main>
         <div>
-            <form @submit.prevent="fetchData">
+            <form @submit.prevent="handleSubmit">
                 <input v-model="city">
                 <button type="submit">Submit</button>
             </form>
@@ -93,7 +118,7 @@ onMounted(()=>{
                     <div> Departure Track</div>
                     <div> Arrival Track</div>
                 </div>
-
+          
                 <div
                 class="departure-grid row"
                 v-for="departure in departuresResponse"
@@ -105,10 +130,13 @@ onMounted(()=>{
                     <div>{{ departure.track_arrival }}</div>
                 </div>
             </div>
+           
+
+
         </div>
 
         <div class="radio-player">
-            <h2>Live radio: Omrop Fryslân</h2>
+            <h2>Local Live Radio</h2>
             <audio ref="audioRef" controls autoplay :src="streamUrl"></audio>
         </div>
         <div v-if="catFacts.length" class="info departures">
