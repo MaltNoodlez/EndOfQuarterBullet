@@ -7,6 +7,22 @@ const route = useRoute()
 const city = ref(route.query.city || 'Enschede')
 const channel = new BroadcastChannel('train-route-channel')
 
+const currentTime = ref(new Date().toLocaleTimeString('nl-NL', {
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit'
+}))
+
+onMounted(() => {
+  setInterval(() => {
+    currentTime.value = new Date().toLocaleTimeString('nl-NL', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+  }, 1000)
+})
+
 const lelijkeLijst = {
     "http://streams.rtvoost.nl/audio/allesplat/mp3": "RTV Oost",
     "https://cdn.rtvdrenthe.nl/icecast/rtvdrenthe/rtvradio": "RTV Drenthe",
@@ -42,6 +58,7 @@ function displayRouteStations(stations) {
 /* ================= STATE ================= */
 const departuresResponse = ref([])
 const streamUrl = ref('')
+const weatherData = ref({})
 
 /* ================= SELECT ROUTE ================= */
 const selectRoute = (departure) => {
@@ -76,6 +93,21 @@ const fetchRadio = async () => {
         streamUrl.value = data
     } catch (err) {
         console.error('Error fetching radio:', err)
+    }
+}
+
+const fetchWeather = async () => {
+    try {
+        const response = await fetch('http://localhost:3001/getWeather', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ city: city.value })
+        })
+
+        const data = await response.json()
+        weatherData.value = data
+    } catch (err) {
+        console.error('Error fetching weather:', err)
     }
 }
 
@@ -116,6 +148,7 @@ function handleSubmit() {
 
 /* ================= INIT ================= */
 onMounted(() => {
+    fetchWeather()
     fetchData()
     fetchRadio()
 })
@@ -132,7 +165,9 @@ onMounted(() => {
         <div class="wrapper">
             <div class="info">
                 <h2>Current location: {{ city }}</h2>
+                <h2>Current time: {{ currentTime }}</h2>
             </div>
+
 
             <div class="info departures">
                 <h2>Upcoming departures:</h2>

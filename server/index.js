@@ -8,8 +8,9 @@ app.use(express.json());
 app.use(cors())
 
 const API = process.env.NS_API || 'b9b6ca97eaff4e34abaa3843eebf8984';
-const WORLD_API = process.env.STATE_API;
-const COUNTRY_ISO2 = "NL"
+const WORLD_API = process.env.STATE_API || '01f45091479247a3c9a88fe600d53dbd689252f2e621ba5db6d7a907de06ac72';
+const COUNTRY_ISO2 = "NL";
+const WEATHER_API = process.env.WEATHER_API || 'a5b331616526624427866e91ffd96af1';
 
 const catfact = `https://meowfacts.herokuapp.com/?lang=eng&count=3`
 
@@ -38,6 +39,21 @@ async function catFact() {
     const catFactResponse = await fetch(catfact)
     const catData = await catFactResponse.json();
     return catData.data
+}
+
+async function getWeather(cityName){
+    const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${cityName},nl&appid=${WEATHER_API}&units=metric`
+    );
+    const weather = await response.json();
+    console.log(weather)
+
+    weather.value = {
+        temp: Math.round(data.main.temp),
+        description: data.weather[0].description
+    } 
+
+    return weather
 }
 
 async function lookUpProvince(cityName) {
@@ -76,12 +92,24 @@ app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}  `);
 });
 
+app.post('/getWeather', async (req, res) => {
+    const {city}=req.body
+
+    try {
+        const data = await getWeather(city);
+        console.log(data);
+        res.status(200).json(data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch weather data '});
+    }
+});
+
 app.post('/getTrain', async (req, res) => {
     const {city}=req.body
     
     try {
         const data = await getStations(city);
-        console.log('error')
         console.log(data);
         res.status(200).json(data);
     } catch (error) {
