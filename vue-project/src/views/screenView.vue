@@ -65,40 +65,110 @@ const formatTime = (dateString) => {
 //     try {
 //         const response = await fetch('http://localhost:3000/getTrain')
 //         if (!response.ok) throw new Error('Network error')
+import { onMounted, onUnmounted, ref } from 'vue'
+
+/* ================= STATE ================= */
+const route = ref(null)
+const streamUrl = ref('')
+
+/* ================= LISTEN FOR ROUTE SELECTION ================= */
+const handleStorageChange = (event) => {
+  if (event.key === 'selectedRoute' && event.newValue) {
+    const selectedRoute = JSON.parse(event.newValue)
+    
+    route.value = {
+      direction: selectedRoute.name,
+      departureTime: selectedRoute.departureTime,
+      track: selectedRoute.track_departure,
+      stations: selectedRoute.routeStations || []
+    }
+    
+    console.log('New route received:', route.value)
+  }
+}
+
+/* ================= FETCH RADIO ================= */
+const fetchRadio = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/radio', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ city: 'Enschede' })
+    })
 
 //         const data = await response.json()
-//         trains.value = data.payload.departures
+//         streamUrl.value = data.value
 //     } catch (err) {
-//         console.error(err)
+//         console.error('Error fetching radio:', err)
 //     }
 // }
 
-// onMounted(fetchData)
-console.log(trains)
+// /* ================= INIT ================= */
+onMounted(() => {
+  // Listen for localStorage changes from other tabs/windows
+  window.addEventListener('storage', handleStorageChange)
+  
+  // Check if there's already a selected route
+  const savedRoute = localStorage.getItem('selectedRoute')
+  if (savedRoute) {
+    const selectedRoute = JSON.parse(savedRoute)
+    route.value = {
+      direction: selectedRoute.name,
+      departureTime: selectedRoute.departureTime,
+      track: selectedRoute.track_departure,
+      stations: selectedRoute.routeStations || []
+    }
+  }
+  
+  fetchRadio()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('storage', handleStorageChange)
+})
 
 </script>
 
-
-
 <template>
-    <header>
-        <div class="app-header">
-            <img src=" @/logos/ns_logo.png" />
-            <h2>IC Direct to {{ destination }}</h2>
-        </div>
-    </header>
+  <header>
+    <div class="app-header">
+      <img src="@/logos/ns_logo.png" />
+      <h2>{{ route ? 'IC Direct to ' + route.direction : 'Select a destination' }}</h2>
+    </div>
+  </header>
 
     <div class="main-content">
         <!-- LEFT: timeline -->
         <div class="timeline">
             <h2>Departures</h2>
 
-            <div v-for="(train, index) in trains" :key="index">
-                {{ train.direction }} —
-                {{ formatTime(train.plannedDateTime) }} —
-                {{ train.name }}
-            </div>
+      <h3>{{ route.direction }}</h3>
+
+      <div
+        v-for="(station, index) in route.stations"
+        :key="index"
+        class="timeline-row"
+      >
+        <div class="dot"></div>
+
+        <div class="station-name">
+          {{ station }}
         </div>
+
+        <!-- <div class="meta">
+          <span class="time">
+            {{ index === 0 ? route.departureTime : '' }}
+          </span>
+          <span class="track">
+            {{ index === 0 ? 'Track ' + route.track : '' }}
+          </span>
+        </div> -->
+      </div>
+    </div>
+
+    <div v-else class="no-route">
+      <p>👆 Click a destination on the station view to see the route</p>
+    </div>
 
         <!-- RIGHT: video -->
         <div class="content">
@@ -130,38 +200,30 @@ console.log(trains)
 
 <style>
 body {
-    color: white;
+  color: white;
+  background: #1a1a2e;
+  margin: 0;
 }
 
 header {
-    height: 132px;
-    background-color: #648DE5;
-    margin: 0;
-    color: white;
-    padding: 1em;
-    display: flex
-}
-
-p {
-    margin: 0;
+  height: 132px;
+  background-color: #648DE5;
+  padding: 1em;
+  display: flex;
+  align-items: center;
 }
 
 .app-header {
-    display: flex;
-    gap: 50px;
-    align-items: center;
+  display: flex;
+  gap: 40px;
+  align-items: center;
 }
-
-
-.video {
-    background-color: white
-}
-
 
 .main-content {
-    display: flex;
-    gap: 30px;
-    padding: 20px;
+  display: flex;
+  gap: 30px;
+  padding: 20px;
+  min-height: calc(100vh - 132px);
 }
 
 .content {
@@ -186,59 +248,66 @@ p {
 }
 
 .timeline::before {
-    content: "";
-    position: absolute;
-    left: 12px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: #ccc;
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 60px;
+  bottom: 0;
+  width: 2px;
+  background: #ccc;
 }
 
 .timeline-row {
-    display: grid;
-    grid-template-columns: 20px 1fr auto;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 30px;
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
 }
 
 .dot {
-    width: 10px;
-    height: 10px;
-    background: white;
-    border-radius: 50%;
-    z-index: 1;
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  z-index: 1;
 }
 
 .station-name {
-    font-size: 1.1rem;
+  font-size: 1.05rem;
 }
 
 .meta {
-    text-align: right;
-    font-size: 0.9rem;
-    opacity: 0.85;
+  text-align: right;
+  font-size: 0.85rem;
+  opacity: 0.85;
 }
 
-.time {
-    display: block;
-}
-
+.time,
 .track {
-    display: block;
+  display: block;
 }
 
+/* ===== NO ROUTE ===== */
+.no-route {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  opacity: 0.6;
+}
+
+/* ===== RIGHT SIDE ===== */
 .video-wrapper {
-    flex: 1.2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  flex: 1.2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.video {
-    width: 100%;
-    max-width: 600px;
-    height: auto;
+audio {
+  width: 100%;
+  max-width: 400px;
 }
 </style>

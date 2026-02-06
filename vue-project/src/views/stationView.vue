@@ -1,8 +1,11 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-
+import { useRouter } from 'vue-router'
 const city = ref('Enschede')
 const twitchChannel = "shrimps247"
+const navigate=useRouter()
+// Create a broadcast channel
+const channel = new BroadcastChannel('train-route-channel')
 
 /* ================= HELPERS ================= */
 function formatTime(dateString) {
@@ -23,6 +26,26 @@ function displayRouteStations(stations) {
 /* ================= STATE ================= */
 const departuresResponse = ref([])
 const streamUrl = ref('')
+
+/* ================= SELECT ROUTE ================= */
+const selectRoute = (departure) => {
+  console.log('Sending route:', departure.name)
+  
+  // Convert to plain object (remove Vue reactivity)
+  const plainDeparture = JSON.parse(JSON.stringify(departure))
+  
+  // Broadcast the selected route to other tabs/windows
+  channel.postMessage({
+    type: 'ROUTE_SELECTED',
+    route: plainDeparture
+  })
+  
+  // Also save to localStorage as backup
+  localStorage.setItem('selectedRoute', JSON.stringify(plainDeparture))
+  
+  console.log('Route sent successfully!')
+  navigate.push("/screen")
+}
 
 /* ================= FETCH RADIO ================= */
 const fetchRadio = async () => {
@@ -52,6 +75,17 @@ const fetchData = async () => {
         const data = await response.json()
         console.log(data)
 
+    departuresResponse.value = data.payload.departures.map((d, index) => ({
+      id: index,
+      name: d.direction,
+      departureTime: formatTime(d.plannedDateTime),
+      track_departure: d.plannedTrack ?? '-',
+      track_arrival: d.actualTrack ?? '-',
+      routeStations: d.routeStations?.map(s => s.mediumName) ?? []
+    }))
+  } catch (err) {
+    console.error('Error fetching train data:', err)
+  }
         departuresResponse.value = data.payload.departures.map((d, index) => ({
             id: index,
             name: d.direction,
@@ -77,8 +111,10 @@ onMounted(() => {
     fetchData()
     fetchRadio()
 })
+const handleSubmit=()=>{
+    fetchData()
+}
 </script>
-
 
 <template>
     <main>
@@ -100,8 +136,8 @@ onMounted(() => {
                 <div class="departure-grid header">
                     <div>Destination</div>
                     <div>Departing in:</div>
-                    <div> Departure Track</div>
-                    <div> Arrival Track</div>
+                    <div>Departure Track</div>
+                    <div>Arrival Track</div>
                 </div>
 
                 <div class="departure-grid row" v-for="departure in departuresResponse" :key="departure.id">
@@ -178,5 +214,19 @@ h2 {
 .departure-grid.row div {
     padding: 0.5rem 0.8rem;
     color: #111827;
+}
+
+.clickable {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clickable:hover {
+    background-color: rgba(30, 58, 138, 0.2);
+    font-weight: 600;
+}
+
+.clickable:active {
+    transform: scale(0.98);
 }
 </style>
