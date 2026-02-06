@@ -12,6 +12,8 @@ import goat from '@/images/goat.jpg'
 const catFact = ref('Loading cat fact...')
 const route = ref(null)
 const streamUrl = ref('')
+const videoId = 'F5tsZyPDL6w' // the YouTube livestream ID
+const embedUrl = computed(() => `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`)
 
 // ===== FETCH CAT FACT =====
 const fetchCatFact = async () => {
@@ -145,26 +147,19 @@ onUnmounted(() => {
     </div>
 
     <!-- RIGHT: rotating content -->
-    <div class="content">
-      <div v-if="content">
-        <img
-          v-if="content.type === 'img'"
-          :src="content.src"
-          class="fullscreen"
-          alt="Slide image"
-        />
-        <video
-          v-else-if="content.type === 'video'"
-          :src="content.src"
-          autoplay
-          muted
-          playsinline
-          class="fullscreen"
-        ></video>
-        <div v-else-if="content.type === 'text'" class="text-slide">
-          {{ content.content }}
-        </div>
-      </div>
+  
+  <div class="youtube-player">
+    <h2>Live view</h2>
+    <iframe
+      width="560"
+      height="315"
+      :src="embedUrl"
+      title="YouTube live stream"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen
+    ></iframe>
+  </div>
     </div>
 
     <!-- BOTTOM: live radio -->
@@ -172,7 +167,6 @@ onUnmounted(() => {
       <h2>Live radio: Omrop Fryslân</h2>
       <audio v-if="streamUrl" controls autoplay :src="streamUrl"></audio>
     </div>
-  </div>
 </template>
 
 
