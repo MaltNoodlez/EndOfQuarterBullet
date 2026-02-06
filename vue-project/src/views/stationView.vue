@@ -9,15 +9,6 @@ const navigate = useRouter()
 // Create a broadcast channel
 const channel = new BroadcastChannel('train-route-channel')
 
-watch(city, () => {
-    router.replace({
-        path: "/station",
-        query: {
-            city
-        }
-    })
-})
-
 /* ================= HELPERS ================= */
 function formatTime(dateString) {
     const date = new Date(dateString)
