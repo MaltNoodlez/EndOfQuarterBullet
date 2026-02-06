@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 
 const city = ref('Enschede')
+const twitchChannel = "shrimps247"
 
 /* ================= HELPERS ================= */
 function formatTime(dateString) {
@@ -90,7 +91,7 @@ onMounted(() => {
         <div class="wrapper">
             <div class="info">
                 <h2>Current location: {{ city }}</h2>
-                
+                <iframe :src="`https://player.twitch.tv/?channel=${twitchChannel}&parent=localhost&autoplay=true`" height="380" width="600" frameborder="0"></iframe>
             </div>
 
             <div class="info departures">
