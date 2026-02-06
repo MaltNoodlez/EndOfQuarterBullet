@@ -1,11 +1,22 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+
+const router = useRouter()
 const city = ref('Enschede')
 const twitchChannel = "shrimps247"
-const navigate=useRouter()
+const navigate = useRouter()
 // Create a broadcast channel
 const channel = new BroadcastChannel('train-route-channel')
+
+watch(city, () => {
+    router.replace({
+        path: "/station",
+        query: {
+            city
+        }
+    })
+})
 
 /* ================= HELPERS ================= */
 function formatTime(dateString) {
@@ -29,22 +40,22 @@ const streamUrl = ref('')
 
 /* ================= SELECT ROUTE ================= */
 const selectRoute = (departure) => {
-  console.log('Sending route:', departure.name)
-  
-  // Convert to plain object (remove Vue reactivity)
-  const plainDeparture = JSON.parse(JSON.stringify(departure))
-  
-  // Broadcast the selected route to other tabs/windows
-  channel.postMessage({
-    type: 'ROUTE_SELECTED',
-    route: plainDeparture
-  })
-  
-  // Also save to localStorage as backup
-  localStorage.setItem('selectedRoute', JSON.stringify(plainDeparture))
-  
-  console.log('Route sent successfully!')
-  navigate.push("/screen")
+    console.log('Sending route:', departure.name)
+
+    // Convert to plain object (remove Vue reactivity)
+    const plainDeparture = JSON.parse(JSON.stringify(departure))
+
+    // Broadcast the selected route to other tabs/windows
+    channel.postMessage({
+        type: 'ROUTE_SELECTED',
+        route: plainDeparture
+    })
+
+    // Also save to localStorage as backup
+    localStorage.setItem('selectedRoute', JSON.stringify(plainDeparture))
+
+    console.log('Route sent successfully!')
+    navigate.push("/screen")
 }
 
 /* ================= FETCH RADIO ================= */
@@ -84,9 +95,9 @@ const fetchData = async () => {
 
             routeStations: d.routeStations?.map(s => s.mediumName) ?? []
         }))
-  } catch (err) {
-    console.error('Error fetching train data:', err)
-  }
+    } catch (err) {
+        console.error('Error fetching train data:', err)
+    }
 }
 
 function handleSubmit() {
@@ -112,7 +123,6 @@ onMounted(() => {
         <div class="wrapper">
             <div class="info">
                 <h2>Current location: {{ city }}</h2>
-                <iframe :src="`https://player.twitch.tv/?channel=${twitchChannel}&parent=localhost&autoplay=true`" height="380" width="600" frameborder="0"></iframe>
             </div>
 
             <div class="info departures">
