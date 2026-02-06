@@ -5,86 +5,73 @@ const city = ref('Enschede')
 
 /* ================= HELPERS ================= */
 function formatTime(dateString) {
-  const date = new Date(dateString)
-  return date.toLocaleTimeString('nl-NL', {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+    const date = new Date(dateString)
+    return date.toLocaleTimeString('nl-NL', {
+        hour: '2-digit',
+        minute: '2-digit'
+    })
 }
 
 function displayRouteStations(stations) {
-  if (!stations || stations.length === 0) {
-    return 'No intermediate stops'
-  }
-  return stations.join(' → ')
+    if (!stations || stations.length === 0) {
+        return 'No intermediate stops'
+    }
+    return stations.join(' → ')
 }
 
 /* ================= STATE ================= */
 const departuresResponse = ref([])
-const catFacts = ref([])
 const streamUrl = ref('')
-
-/* ================= FETCH CAT FACT ================= */
-const fetchCatFact = async () => {
-  try {
-    const response = await fetch('http://localhost:3001/getCatFact')
-    if (!response.ok) throw new Error(response.status)
-    catFacts.value = await response.json()
-  } catch (err) {
-    console.error('Error fetching cat fact:', err)
-  }
-}
 
 /* ================= FETCH RADIO ================= */
 const fetchRadio = async () => {
-  try {
-    const response = await fetch('http://localhost:3001/radio', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ city: city.value })
-    })
+    try {
+        const response = await fetch('http://localhost:3001/radio', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ city: city.value })
+        })
 
-    const data = await response.json()
-    streamUrl.value = data
-  } catch (err) {
-    console.error('Error fetching radio:', err)
-  }
+        const data = await response.json()
+        streamUrl.value = data.value
+    } catch (err) {
+        console.error('Error fetching radio:', err)
+    }
 }
 
 /* ================= FETCH TRAIN DATA ================= */
 const fetchData = async () => {
-  try {
-    const response = await fetch('http://localhost:3001/getTrain/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ city: city.value })
-    })
+    try {
+        const response = await fetch('http://localhost:3001/getTrain/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ city: city.value })
+        })
 
-    const data = await response.json()
-    console.log(data)
+        const data = await response.json()
+        console.log(data)
 
-    departuresResponse.value = data.payload.departures.map((d, index) => ({
-      id: index,
-      name: d.direction,
-      departureTime: formatTime(d.plannedDateTime),
-      track_departure: d.plannedTrack ?? '-',
-      track_arrival: d.actualTrack ?? '-',
+        departuresResponse.value = data.payload.departures.map((d, index) => ({
+            id: index,
+            name: d.direction,
+            departureTime: formatTime(d.plannedDateTime),
+            track_departure: d.plannedTrack ?? '-',
+            track_arrival: d.actualTrack ?? '-',
 
-      // 👇 route stations extracted here
-      routeStations: d.routeStations?.map(s => s.mediumName) ?? []
-    }))
-  } catch (err) {
-    console.error('Error fetching train data:', err)
-  }
+            // 👇 route stations extracted here
+            routeStations: d.routeStations?.map(s => s.mediumName) ?? []
+        }))
+    } catch (err) {
+        console.error('Error fetching train data:', err)
+    }
 }
-const handleSubmit =()=>{
+const handleSubmit = () => {
     fetchData()
 }
 /* ================= INIT ================= */
 onMounted(() => {
-  fetchData()
-  fetchRadio()
-  fetchCatFact()
+    fetchData()
+    fetchRadio()
 })
 </script>
 
@@ -112,34 +99,19 @@ onMounted(() => {
                     <div> Departure Track</div>
                     <div> Arrival Track</div>
                 </div>
-          
-                <div
-                class="departure-grid row"
-                v-for="departure in departuresResponse"
-                :key="departure.id"
-                >
+
+                <div class="departure-grid row" v-for="departure in departuresResponse" :key="departure.id">
                     <div>{{ departure.name }}</div>
                     <div>{{ departure.departureTime }}</div>
                     <div>{{ departure.track_departure }}</div>
                     <div>{{ departure.track_arrival }}</div>
                 </div>
             </div>
-           
-
-
         </div>
 
         <div class="radio-player">
             <h2>Live radio: Omrop Fryslân</h2>
             <audio ref="audioRef" controls autoplay :src="streamUrl"></audio>
-        </div>
-        <div v-if="catFacts.length" class="info departures">
-            <h3>Cat facts 🐱</h3>
-            <ul>
-                <li v-for="(fact, index) in catFacts" :key="index">
-                {{ fact }}
-                </li>
-            </ul>
         </div>
     </main>
 </template>
