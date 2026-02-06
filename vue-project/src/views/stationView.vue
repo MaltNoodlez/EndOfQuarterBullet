@@ -99,7 +99,8 @@ onMounted(() => {
         </div>
         <div class="wrapper">
             <div class="info">
-                <h2>Current location: {{ currentLocation }}</h2>
+                <h2>Current location: {{ city }}</h2>
+                
             </div>
 
             <div class="info departures">
