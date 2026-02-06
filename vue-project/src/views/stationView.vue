@@ -21,7 +21,6 @@ function displayRouteStations(stations) {
 
 /* ================= STATE ================= */
 const departuresResponse = ref([])
-const catFacts = ref([])
 const streamUrl = ref('')
 
 /* ================= FETCH RADIO ================= */
@@ -73,7 +72,6 @@ const handleSubmit = () => {
 onMounted(() => {
     fetchData()
     fetchRadio()
-    fetchCatFact()
 })
 </script>
 
