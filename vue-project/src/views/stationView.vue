@@ -5,9 +5,6 @@ const currentStation = ref("Den Haag")
 const city = ref("Enschede")
 const audioRef = ref(null)
 
-const currentStation = ref('Den Haag')
-const city = ref('Enschede')
-
 /* ================= HELPERS ================= */
 function formatTime(dateString) {
   const date = new Date(dateString)
@@ -15,6 +12,11 @@ function formatTime(dateString) {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+function handleSubmit(){
+    fetchData()
+    fetchRadio()
 }
 
 function displayRouteStations(stations) {
