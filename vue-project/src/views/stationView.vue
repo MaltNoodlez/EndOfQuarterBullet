@@ -1,9 +1,8 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
-// const streamUrl = ref('https://stream.radionl.fm/rnlfriesland')
-const currentStation = ref("Den Haag")
-const city = ref("Enschede")
-const audioRef = ref(null)
+import { onMounted, ref } from 'vue'
+
+const currentStation = ref('Den Haag')
+const city = ref('Enschede')
 
 /* ================= HELPERS ================= */
 function formatTime(dateString) {
@@ -12,11 +11,6 @@ function formatTime(dateString) {
     hour: '2-digit',
     minute: '2-digit'
   })
-}
-
-function handleSubmit(){
-    fetchData()
-    fetchRadio()
 }
 
 function displayRouteStations(stations) {
@@ -29,7 +23,7 @@ function displayRouteStations(stations) {
 /* ================= STATE ================= */
 const departuresResponse = ref([])
 const catFacts = ref([])
-const streamUrl = ref("")
+const streamUrl = ref('')
 
 /* ================= FETCH CAT FACT ================= */
 const fetchCatFact = async () => {
@@ -51,13 +45,11 @@ const fetchRadio = async () => {
       body: JSON.stringify({ city: city.value })
     })
 
-    const data = await response.json();
-
-    streamUrl.value = data;
-    console.log(data)
-    } catch(err) {
-        console.log('Error fetching data:', err);
-    }
+    const data = await response.json()
+    streamUrl.value = data.value
+  } catch (err) {
+    console.error('Error fetching radio:', err)
+  }
 }
 
 /* ================= FETCH TRAIN DATA ================= */
@@ -86,7 +78,9 @@ const fetchData = async () => {
     console.error('Error fetching train data:', err)
   }
 }
-
+const handleSubmit =()=>{
+    fetchData()
+}
 /* ================= INIT ================= */
 onMounted(() => {
   fetchData()
@@ -136,7 +130,7 @@ onMounted(() => {
         </div>
 
         <div class="radio-player">
-            <h2>Local Live Radio</h2>
+            <h2>Live radio: Omrop Fryslân</h2>
             <audio ref="audioRef" controls autoplay :src="streamUrl"></audio>
         </div>
         <div v-if="catFacts.length" class="info departures">
