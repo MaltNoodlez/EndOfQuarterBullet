@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-const streamUrl = ref('https://stream.radionl.fm/rnlfriesland')
+// const streamUrl = ref('https://stream.radionl.fm/rnlfriesland')
 const currentStation = ref("Den Haag")
 const city = ref("Enschede")
 
@@ -13,14 +13,15 @@ function formatTime(dateString) {
   });
 }
 
+function handleSubmit(){
+    fetchData();
+    fetchRadio();
+}
+
 
 const departuresResponse = ref([])
-
 const catFacts = ref([])
-
-const fetchRadio = async () => {
-    
-}
+let streamUrl = ref("")
 
 const fetchCatFact = async () => {
   try {
@@ -37,6 +38,25 @@ const fetchCatFact = async () => {
   } catch (err) {
     console.error('Error fetching cat fact:', err)
   }
+}
+
+const fetchRadio = async () => {
+    try {
+        const response = await fetch('http://localhost:3000/radio', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                city: city.value,
+            }),
+        });
+
+    const data = await response.json();
+    streamUrl = data.value;
+    } catch(err) {
+        console.log('Error fetching data:', err);
+    }
 }
 
 const fetchData = async () => {
@@ -67,6 +87,7 @@ const fetchData = async () => {
 
 onMounted(()=>{
     fetchData();
+    fetchRadio();
     fetchCatFact();
 });
 </script>
@@ -74,7 +95,7 @@ onMounted(()=>{
 <template>
     <main>
         <div>
-            <form @submit.prevent="fetchData">
+            <form @submit.prevent="handleSubmit">
                 <input v-model="city">
                 <button type="submit">Submit</button>
             </form>

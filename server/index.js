@@ -105,7 +105,7 @@ app.post('/radio', async (req, res) => {
         const currentProvince = await lookUpProvince(city);
         const localRadio = getLocalRadio(currentProvince['province'])
         console.log(localRadio);
-        res.status(200).json(currentProvince);
+        res.status(200).json(localRadio);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch province data'})
