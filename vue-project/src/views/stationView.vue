@@ -18,6 +18,7 @@ function formatTime(dateString) {
     })
 }
 
+
 function displayRouteStations(stations) {
     if (!stations || stations.length === 0) {
         return 'No intermediate stops'
@@ -92,6 +93,10 @@ const fetchData = async () => {
 }
 
 function handleSubmit() {
+    router.replace({
+        path: '/station',
+        query: { city: city.value }
+    })
     fetchData()
     fetchRadio()
 }
@@ -127,7 +132,9 @@ onMounted(() => {
                 </div>
 
                 <div class="departure-grid row" v-for="departure in departuresResponse" :key="departure.id">
-                    <div>{{ departure.name }}</div>
+                    <div class="clickable" @click="selectRoute(departure)">
+                        {{ departure.name }}
+                    </div>
                     <div>{{ departure.departureTime }}</div>
                     <div>{{ departure.track_departure }}</div>
                     <div>{{ departure.track_arrival }}</div>
