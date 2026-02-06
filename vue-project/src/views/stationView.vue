@@ -1,22 +1,23 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
-const city = ref('Enschede')
-const twitchChannel = "shrimps247"
-const navigate = useRouter()
-// Create a broadcast channel
+const route = useRoute()
+const city = ref(route.query.city || 'Enschede')
 const channel = new BroadcastChannel('train-route-channel')
+
+
 
 watch(city, () => {
     router.replace({
-        path: "/station",
-        query: {
-            city
-        }
+        path: '/station',
+        query: { city: city.value }
     })
 })
+
+
+
 
 /* ================= HELPERS ================= */
 function formatTime(dateString) {
@@ -136,7 +137,7 @@ onMounted(() => {
                 </div>
 
                 <div class="departure-grid row" v-for="departure in departuresResponse" :key="departure.id">
-                    <div>{{ departure.name }}</div>
+                    <router-link :to="`/screen/${departure.name}`"/>
                     <div>{{ departure.departureTime }}</div>
                     <div>{{ departure.track_departure }}</div>
                     <div>{{ departure.track_arrival }}</div>

@@ -3,10 +3,8 @@ import stationView from '@/views/stationView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
-  { path: '/screen', component: screenView },
-  { path: '/rotterdam', component: stationView },
-  
-    
+  { path: '/screen/:name?', component: screenView },
+  { path: '/station', component: stationView },
 ]
 
 const router = createRouter({
