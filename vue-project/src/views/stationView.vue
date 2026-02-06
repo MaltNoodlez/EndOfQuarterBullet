@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
@@ -45,7 +45,7 @@ const selectRoute = (departure) => {
     localStorage.setItem('selectedRoute', JSON.stringify(plainDeparture))
 
     console.log('Route sent successfully!')
-    navigate.push("/screen")
+    router.push("/screen")
 }
 
 /* ================= FETCH RADIO ================= */

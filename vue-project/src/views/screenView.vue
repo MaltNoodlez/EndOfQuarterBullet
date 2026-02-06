@@ -41,7 +41,7 @@ const items = ref([
     { type: 'img', src: snake },
     { type: 'img', src: cat },
     { type: 'img', src: goat },
-    { type: 'text', content: catFact.value }
+    { type: 'text', content: catFact.value },
     { type: 'img', src: snake },
     { type: 'img', src: cat },
     { type: 'img', src: goat },
@@ -115,12 +115,6 @@ const formatTime = (dateString) => {
         hour: '2-digit',
         minute: '2-digit'
     })
-    if (!dateString) return ''
-    const date = new Date(dateString)
-    return date.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit'
-    })
 }
 
 // ===== LIFECYCLE =====
@@ -135,17 +129,6 @@ onMounted(() => {
     // Listen for changes from other tabs
     window.addEventListener('storage', handleStorageChange)
 
-    // Load saved route from localStorage
-    const savedRoute = localStorage.getItem('selectedRoute')
-    if (savedRoute) {
-        const sel = JSON.parse(savedRoute)
-        route.value = {
-            direction: sel.name,
-            departureTime: sel.departureTime,
-            track: sel.track_departure,
-            stations: sel.routeStations || []
-        }
-    }
     // Load saved route from localStorage
     const savedRoute = localStorage.getItem('selectedRoute')
     if (savedRoute) {
@@ -173,12 +156,6 @@ onUnmounted(() => {
             <h2>{{ route ? 'IC Direct to ' + route.direction : 'Select a destination' }}</h2>
         </div>
     </header>
-    <header>
-        <div class="app-header">
-            <img src="@/logos/ns_logo.png" alt="NS Logo" />
-            <h2>{{ route ? 'IC Direct to ' + route.direction : 'Select a destination' }}</h2>
-        </div>
-    </header>
 
     <div class="main-content">
         <!-- LEFT: timeline -->
@@ -198,19 +175,12 @@ onUnmounted(() => {
                 <p>👆 Click a destination on the station view to see the route</p>
             </div>
         </div>
-            <div v-else class="no-route">
+        <!-- </div> -->
+        <!-- <div v-else class="no-route">
                 <p>👆 Click a destination on the station view to see the route</p>
-            </div>
-        </div>
+            </div> -->
+        <!-- </div> -->
 
-        <!-- RIGHT: rotating content -->
-
-        <div class="youtube-player">
-            <h2>Live view</h2>
-            <iframe width="560" height="315" :src="embedUrl" title="YouTube live stream" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen></iframe>
-        </div>
         <!-- RIGHT: rotating content -->
 
         <div class="youtube-player">
@@ -223,8 +193,6 @@ onUnmounted(() => {
 
     <!-- BOTTOM: live radio -->
     <div class="radio-player">
-        <h2>Live radio: Omrop Fryslân</h2>
-        <audio v-if="streamUrl" controls autoplay :src="streamUrl"></audio>
         <h2>Live radio: Omrop Fryslân</h2>
         <audio v-if="streamUrl" controls autoplay :src="streamUrl"></audio>
     </div>
