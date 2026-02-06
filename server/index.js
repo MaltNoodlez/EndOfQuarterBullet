@@ -2,7 +2,7 @@ const express = require('express');
 const cors= require('cors')
 const {getLocalRadio} = require('./provinceRadio')
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 require('dotenv').config();
 app.use(express.json());
 app.use(cors())

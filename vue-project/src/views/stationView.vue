@@ -28,7 +28,7 @@ const streamUrl = ref('')
 /* ================= FETCH CAT FACT ================= */
 const fetchCatFact = async () => {
   try {
-    const response = await fetch('http://localhost:3000/getCatFact')
+    const response = await fetch('http://localhost:3001/getCatFact')
     if (!response.ok) throw new Error(response.status)
     catFacts.value = await response.json()
   } catch (err) {
@@ -39,7 +39,7 @@ const fetchCatFact = async () => {
 /* ================= FETCH RADIO ================= */
 const fetchRadio = async () => {
   try {
-    const response = await fetch('http://localhost:3000/radio', {
+    const response = await fetch('http://localhost:3001/radio', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ city: city.value })
@@ -55,7 +55,7 @@ const fetchRadio = async () => {
 /* ================= FETCH TRAIN DATA ================= */
 const fetchData = async () => {
   try {
-    const response = await fetch('http://localhost:3000/getTrain/', {
+    const response = await fetch('http://localhost:3001/getTrain/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ city: city.value })
