@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
-const currentStation = ref('Den Haag')
 const city = ref('Enschede')
 
 /* ================= HELPERS ================= */
@@ -46,7 +45,7 @@ const fetchRadio = async () => {
     })
 
     const data = await response.json()
-    streamUrl.value = data.value
+    streamUrl.value = data
   } catch (err) {
     console.error('Error fetching radio:', err)
   }
