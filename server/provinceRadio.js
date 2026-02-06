@@ -1,7 +1,7 @@
 const radioList = {
     'Overijssel': "Radio Oost",
     'Drenthe': "RTV Drenthe",
-    'Friesland': "Omroep Friesland",
+    'Friesland': 'https://stream.radionl.fm/rnlfriesland',
     'Groningen': "RTV Noord",
     'Flevoland': "Omrop Flevoland",
     'North Holland': "Radio Noord-Holland",

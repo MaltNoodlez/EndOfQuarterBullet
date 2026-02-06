@@ -18,6 +18,10 @@ const departuresResponse = ref([])
 
 const catFacts = ref([])
 
+const fetchRadio = async () => {
+    
+}
+
 const fetchCatFact = async () => {
   try {
     const response = await fetch('http://localhost:3000/getCatFact')
