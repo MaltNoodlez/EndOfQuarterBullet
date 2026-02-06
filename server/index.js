@@ -6,7 +6,7 @@ require('dotenv').config();
 app.use(express.json());
 app.use(cors())
 
-const API = process.env.NS_API;
+const API = process.env.NS_API || 'b9b6ca97eaff4e34abaa3843eebf8984';
 const WORLD_API = process.env.STATE_API;
 const COUNTRY_ISO2 = "NL"
 
