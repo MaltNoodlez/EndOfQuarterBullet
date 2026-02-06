@@ -33,7 +33,7 @@ const fetchRadio = async () => {
         })
 
         const data = await response.json()
-        streamUrl.value = data.value
+        streamUrl.value = data
     } catch (err) {
         console.error('Error fetching radio:', err)
     }
@@ -65,9 +65,12 @@ const fetchData = async () => {
         console.error('Error fetching train data:', err)
     }
 }
-const handleSubmit = () => {
+
+function handleSubmit() {
     fetchData()
+    fetchRadio()
 }
+
 /* ================= INIT ================= */
 onMounted(() => {
     fetchData()
