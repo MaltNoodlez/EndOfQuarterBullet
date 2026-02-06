@@ -1,202 +1,180 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, onUnmounted, ref, watch, computed } from 'vue'
 import { useContentRotator } from '@/composables/useContentRotator'
 import contentSlot from '@/components/contentSlot.vue'
-const trains = ref([])
-const catFact = ref("Loading cat fact...")
+
+// ===== Images =====
 import snake from '@/images/snake.jpeg'
 import cat from '@/images/cat.jpg'
 import goat from '@/images/goat.jpg'
-const destination = "Amsterdam"
 
-const fetchCatFact = async () => {
-    try {
-        const response = await fetch('http://localhost:3001/getCatFact')
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
-        const data = await response.json()
-        catFact.value = data[0]
-        console.log('Cat facts:', data)
-        console.log(catFact.value)
-
-    } catch (err) {
-        console.error('Error fetching cat fact:', err)
-    }
-}
-
-onMounted(fetchCatFact)
-
-const items = computed(() => [
-    {
-        type: "img",
-        src: snake
-    },
-    {
-        type: "img",
-        src: cat
-    },
-    {
-        type: "img",
-        src: goat
-    },
-    {
-        type: "text",
-        content: catFact.value
-    }
-])
-
-// const { currentIndex } = useContentRotator(items, 3000)
-// const content = computed(() => items.value[currentIndex.value])
-
-const formatTime = (dateString) => {
-    if (!dateString) return ''
-    const date = new Date(dateString)
-    return date.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit'
-    })
-}
-
-// const fetchData = async () => {
-//     try {
-//         const response = await fetch('http://localhost:3001/getTrain')
-//         if (!response.ok) throw new Error('Network error')
-//     }
-// }
-
-/* ================= STATE ================= */
+// ===== STATE =====
+const catFact = ref('Loading cat fact...')
 const route = ref(null)
 const streamUrl = ref('')
 
-/* ================= LISTEN FOR ROUTE SELECTION ================= */
-const handleStorageChange = (event) => {
-  if (event.key === 'selectedRoute' && event.newValue) {
-    const selectedRoute = JSON.parse(event.newValue)
-    
-    route.value = {
-      direction: selectedRoute.name,
-      departureTime: selectedRoute.departureTime,
-      track: selectedRoute.track_departure,
-      stations: selectedRoute.routeStations || []
-    }
-    
-    console.log('New route received:', route.value)
+// ===== FETCH CAT FACT =====
+const fetchCatFact = async () => {
+  try {
+    const res = await fetch('http://localhost:3001/getCatFact')
+    if (!res.ok) throw new Error('Network error')
+    const data = await res.json()
+    catFact.value = data[0]
+    console.log('Cat fact:', catFact.value)
+  } catch (err) {
+    console.error('Error fetching cat fact:', err)
   }
 }
 
-/* ================= FETCH RADIO ================= */
+// ===== CONTENT ROTATOR =====
+const items = ref([
+  { type: 'img', src: snake },
+  { type: 'img', src: cat },
+  { type: 'img', src: goat },
+  { type: 'text', content: catFact.value }
+])
+
+// Update text slide when catFact changes
+watch(catFact, (newVal) => {
+  items.value[3].content = newVal
+})
+
+const { currentIndex } = useContentRotator(items, 3000)
+const content = computed(() => items.value[currentIndex.value])
+
+// ===== HANDLE ROUTE SELECTION =====
+const handleStorageChange = (event) => {
+  if (event.key === 'selectedRoute' && event.newValue) {
+    const sel = JSON.parse(event.newValue)
+    route.value = {
+      direction: sel.name,
+      departureTime: sel.departureTime,
+      track: sel.track_departure,
+      stations: sel.routeStations || []
+    }
+    console.log('New route:', route.value)
+  }
+}
+
+// ===== FETCH RADIO =====
 const fetchRadio = async () => {
   try {
-    const response = await fetch('http://localhost:3001/radio', {
+    const res = await fetch('http://localhost:3001/radio', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ city: 'Enschede' })
-    });
-
-        const data = await response.json()
-        streamUrl.value = data.value
-    } catch (err) {
-        console.error('Error fetching radio:', err)
-    }
+    })
+    const data = await res.json()
+    streamUrl.value = data.value
+  } catch (err) {
+    console.error('Error fetching radio:', err)
+  }
 }
 
-// /* ================= INIT ================= */
+// ===== FORMAT TIME HELPER =====
+const formatTime = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+// ===== LIFECYCLE =====
 onMounted(() => {
-  // Listen for localStorage changes from other tabs/windows
+  fetchCatFact()
+  fetchRadio()
+
+  // Listen for changes from other tabs
   window.addEventListener('storage', handleStorageChange)
-  
-  // Check if there's already a selected route
+
+  // Load saved route from localStorage
   const savedRoute = localStorage.getItem('selectedRoute')
   if (savedRoute) {
-    const selectedRoute = JSON.parse(savedRoute)
+    const sel = JSON.parse(savedRoute)
     route.value = {
-      direction: selectedRoute.name,
-      departureTime: selectedRoute.departureTime,
-      track: selectedRoute.track_departure,
-      stations: selectedRoute.routeStations || []
+      direction: sel.name,
+      departureTime: sel.departureTime,
+      track: sel.track_departure,
+      stations: sel.routeStations || []
     }
   }
-  
-  fetchRadio()
 })
 
 onUnmounted(() => {
   window.removeEventListener('storage', handleStorageChange)
 })
-
 </script>
+
 
 <template>
   <header>
     <div class="app-header">
-      <img src="@/logos/ns_logo.png" />
+      <img src="@/logos/ns_logo.png" alt="NS Logo" />
       <h2>{{ route ? 'IC Direct to ' + route.direction : 'Select a destination' }}</h2>
     </div>
   </header>
 
-    <div class="main-content">
-        <!-- LEFT: timeline -->
-        <div class="timeline">
-            <h2>Departures</h2>
+  <div class="main-content">
+    <!-- LEFT: timeline -->
+    <div class="timeline-container">
+      <div v-if="route" class="timeline">
+        <h2>Departures</h2>
+        <h3>{{ route.direction }}</h3>
 
-      <h3>{{ route.direction }}</h3>
+        <div
+          v-for="(station, index) in route.stations"
+          :key="index"
+          class="timeline-row"
+        >
+          <div class="dot"></div>
 
-      <div
-        v-for="(station, index) in route.stations"
-        :key="index"
-        class="timeline-row"
-      >
-        <div class="dot"></div>
+          <div class="station-name">{{ station }}</div>
 
-        <div class="station-name">
-          {{ station }}
+          <div class="meta">
+            <span class="time">{{ index === 0 ? route.departureTime : '' }}</span>
+            <span class="track">{{ index === 0 ? 'Track ' + route.track : '' }}</span>
+          </div>
         </div>
+      </div>
 
-        <div class="meta">
-          <span class="time">
-            {{ index === 0 ? route.departureTime : '' }}
-          </span>
-          <span class="track">
-            {{ index === 0 ? 'Track ' + route.track : '' }}
-          </span>
+      <div v-else class="no-route">
+        <p>👆 Click a destination on the station view to see the route</p>
+      </div>
+    </div>
+
+    <!-- RIGHT: rotating content -->
+    <div class="content">
+      <div v-if="content">
+        <img
+          v-if="content.type === 'img'"
+          :src="content.src"
+          class="fullscreen"
+          alt="Slide image"
+        />
+        <video
+          v-else-if="content.type === 'video'"
+          :src="content.src"
+          autoplay
+          muted
+          playsinline
+          class="fullscreen"
+        ></video>
+        <div v-else-if="content.type === 'text'" class="text-slide">
+          {{ content.content }}
         </div>
       </div>
     </div>
 
-    <div class="no-route">
-      <p>👆 Click a destination on the station view to see the route</p>
+    <!-- BOTTOM: live radio -->
+    <div class="radio-player">
+      <h2>Live radio: Omrop Fryslân</h2>
+      <audio v-if="streamUrl" controls autoplay :src="streamUrl"></audio>
     </div>
-
-        <!-- RIGHT: video -->
-        <div class="content">
-            <content-slot :items="items">
-                <template #default="{ item }">
-                    <template v-if="item">
-
-                        <img v-if="item.type === 'img'" :src="item.src" class="fullscreen" />
-
-                        <video v-else-if="item.type === 'video'" :src="item.src" autoplay muted playsinline
-                            class="fullscreen" />
-
-                        <div v-else-if="item.type === 'text'" class="text-slide">
-                            {{ item.content }}
-                        </div>
-
-                    </template>
-                </template>
-            </content-slot>
-        </div>
-
-        <div class="radio-player">
-            <h2>Live radio: Omrop Fryslân</h2>
-            <audio ref="audioRef" controls autoplay :src="streamUrl"></audio>
-        </div>
-    </div>
-
+  </div>
 </template>
+
 
 <style>
 body {
