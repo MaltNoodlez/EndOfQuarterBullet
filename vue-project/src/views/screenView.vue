@@ -1,31 +1,85 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-
+import { onMounted, ref, computed } from 'vue'
+import { useContentRotator } from '@/composables/useContentRotator'
+import contentSlot from '@/components/contentSlot.vue'
+const streamUrl = ref('https://stream.radionl.fm/rnlfriesland')
 const trains = ref([])
+const catFacts = ref([])
+import snake from '@/images/snake.jpeg'
+import cat from '@/images/cat.jpg'
+import goat from '@/images/goat.jpg'
+const destination = "Amsterdam"
+
+
+// const content = computed(() => items.value[currentIndex.value])
+
+const fetchCatFact = async () => {
+    try {
+        const response = await fetch('http://localhost:3000/getCatFact')
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const data = await response.json()
+        catFacts.value = data
+        console.log('Cat facts:', data)
+
+    } catch (err) {
+        console.error('Error fetching cat fact:', err)
+    }
+}
+
+onMounted(fetchCatFact)
+
+const items = ref([
+    {
+        type: "img",
+        src: snake
+    },
+    {
+        type: "img",
+        src: cat
+    },
+    {
+        type: "img",
+        src: goat
+    },
+    {
+        type: "text",
+        src: catFacts.value[0]
+    }
+])
+
+const { currentIndex } = useContentRotator(items, 3000)
+
 
 const formatTime = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    return date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+    })
 }
 
-const fetchData = async () => {
-  try {
-    const response = await fetch('http://localhost:3000/getTrain')
-    if (!response.ok) throw new Error('Network error')
 
-    const data = await response.json()
-    trains.value = data.payload.departures
-  } catch (err) {
-    console.error(err)
-  }
-}
 
-onMounted(fetchData)
+// const fetchData = async () => {
+//     try {
+//         const response = await fetch('http://localhost:3000/getTrain')
+//         if (!response.ok) throw new Error('Network error')
+
+//         const data = await response.json()
+//         trains.value = data.payload.departures
+//     } catch (err) {
+//         console.error(err)
+//     }
+// }
+
+// onMounted(fetchData)
 console.log(trains)
+
 </script>
 
 
@@ -38,27 +92,43 @@ console.log(trains)
         </div>
     </header>
 
-<div class="main-content">
-  <!-- LEFT: timeline -->
-  <div class="timeline">
-    <h2>Departures</h2>
+    <div class="main-content">
+        <!-- LEFT: timeline -->
+        <div class="timeline">
+            <h2>Departures</h2>
 
-    <div v-for="(train, index) in trains" :key="index">
-      {{ train.direction }} —
-      {{ formatTime(train.plannedDateTime) }} —
-      {{ train.name }}
+            <div v-for="(train, index) in trains" :key="index">
+                {{ train.direction }} —
+                {{ formatTime(train.plannedDateTime) }} —
+                {{ train.name }}
+            </div>
+        </div>
+
+        <!-- RIGHT: video -->
+        <div class="content">
+            <content-slot :items="items">
+                <template #default="{ item }">
+                    <template v-if="item">
+
+                        <img v-if="item.type === 'img'" :src="item.src" class="fullscreen" />
+
+                        <video v-else-if="item.type === 'video'" :src="item.src" autoplay muted playsinline
+                            class="fullscreen" />
+
+                        <div v-else-if="item.type === 'text'" class="text-slide">
+                            {{ item.content }}
+                        </div>
+
+                    </template>
+                </template>
+            </content-slot>
+        </div>
+
+        <div class="radio-player">
+            <h2>Live radio: Omrop Fryslân</h2>
+            <audio ref="audioRef" controls autoplay :src="streamUrl"></audio>
+        </div>
     </div>
-  </div>
-
-  <!-- RIGHT: video -->
-  <div class="content">
-    <content-slot>
-      <template #content>
-        {{ content?.value }}
-      </template>
-    </content-slot>
-  </div>
-</div>
 
 
 </template>
@@ -99,8 +169,21 @@ p {
     padding: 20px;
 }
 
+.content {
+    border: 1px solid white;
+    width: 650px;
+    height: 400px;
+    overflow: hidden;
+}
 
-.timeline {
+.content img,
+.content video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.content>.timeline {
     position: relative;
     flex: 1;
     padding-left: 30px;
@@ -164,4 +247,3 @@ p {
     height: auto;
 }
 </style>
-

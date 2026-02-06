@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from "vue";
 
 </script>
 
@@ -7,7 +6,6 @@ import { ref } from "vue";
 
   <body>
     <nav>
-      <router-link to="/start"> Go to start</router-link>
       <router-link to="/station"> Go to station</router-link>
       <router-link to="/screen"> Go to screen</router-link>
     </nav>

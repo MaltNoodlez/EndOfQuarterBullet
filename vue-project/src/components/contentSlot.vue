@@ -1,9 +1,24 @@
-<template>
-    <div class="content">
-        <slot name="content" />
-    </div>
-</template>
+<script setup>
+import { computed } from 'vue'
+import { useContentRotator } from '@/composables/useContentRotator'
 
-<!-- <div class="video-wrapper">
-    <video controls class="video"></video>
-</div> -->
+const props = defineProps({
+    items: {
+        type: Array,
+        required: true
+    }
+})
+
+const itemsRef = computed(() => props.items || [])
+
+const { currentIndex } = useContentRotator(itemsRef)
+
+const currentItem = computed(() => {
+    if (!itemsRef.value.length) return null
+    return itemsRef.value[currentIndex.value] || null
+})
+</script>
+
+<template>
+    <slot v-if="currentItem" :item="currentItem" :index="currentIndex" />
+</template>
