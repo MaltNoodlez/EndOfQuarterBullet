@@ -7,6 +7,21 @@ const route = useRoute()
 const city = ref(route.query.city || 'Enschede')
 const channel = new BroadcastChannel('train-route-channel')
 
+const lelijkeLijst = {
+    "http://streams.rtvoost.nl/audio/allesplat/mp3": "RTV Oost",
+    "https://cdn.rtvdrenthe.nl/icecast/rtvdrenthe/rtvradio": "RTV Drenthe",
+    'https://stream.radionl.fm/rnlfriesland': "RNL Friesland",
+    "https://media.rtvnoord.nl/icecast/rtvnoord/radio?.mp3": "RTV Noord",
+    "https://stream.omroepflevoland.nl/icecast/omroepflevoland/stream1": "Omroep Flevoland",
+    "https://ice.cr6.streamzilla.xlcdn.com:8000/sz=nhnieuws=NHRadio_mp3": "Noord-Holland Radio",
+    "https://server3.radio-streams.net:18012/denhaagfm": "Den Haag FM",
+    "https://d3isaxd2t6q8zm.cloudfront.net/icecast/omroepzeeland/omroepzeeland_radio": "Omroep Zeeland",
+    "https://live.eemland1.nl/radio": "Eemland 1",
+    "https://d2od87akyl46nm.cloudfront.net/icecast/omroepgelderland/radiogelderland": "Radio Gelderland",
+    "https://d34pj260kw1xmk.cloudfront.net/icecast/l1/radio-bb-mp3": "L1",
+    "http://av.omroepbrabant.nl/icecast/omroepbrabant/mp3": "Omroep Brabant"
+}
+
 /* ================= HELPERS ================= */
 function formatTime(dateString) {
     const date = new Date(dateString)
@@ -124,9 +139,9 @@ onMounted(() => {
 
                 <div class="departure-grid header">
                     <div>Destination</div>
-                    <div>Departing in:</div>
-                    <div>Departure Track</div>
-                    <div>Arrival Track</div>
+                    <div>Departing at:</div>
+                    <div>Departure Track: </div>
+                    <div>Arrival Track:</div>
                 </div>
 
                 <div class="departure-grid row" v-for="departure in departuresResponse" :key="departure.id">
@@ -141,7 +156,7 @@ onMounted(() => {
         </div>
 
         <div class="radio-player">
-            <h2>Live radio</h2>
+            <h2 v-if="streamUrl in lelijkeLijst">Local Live Radio: {{ lelijkeLijst[streamUrl] }}</h2>
             <audio ref="audioRef" controls autoplay :src="streamUrl"></audio>
         </div>
     </main>
