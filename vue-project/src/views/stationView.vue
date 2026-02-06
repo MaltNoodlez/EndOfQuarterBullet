@@ -7,18 +7,6 @@ const route = useRoute()
 const city = ref(route.query.city || 'Enschede')
 const channel = new BroadcastChannel('train-route-channel')
 
-
-
-watch(city, () => {
-    router.replace({
-        path: '/station',
-        query: { city: city.value }
-    })
-})
-
-
-
-
 /* ================= HELPERS ================= */
 function formatTime(dateString) {
     const date = new Date(dateString)
