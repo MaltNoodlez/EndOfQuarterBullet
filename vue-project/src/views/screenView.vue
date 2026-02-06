@@ -4,14 +4,11 @@ import { useContentRotator } from '@/composables/useContentRotator'
 import contentSlot from '@/components/contentSlot.vue'
 const streamUrl = ref('https://stream.radionl.fm/rnlfriesland')
 const trains = ref([])
-const catFacts = ref([])
+const catFact = ref("Loading cat fact...")
 import snake from '@/images/snake.jpeg'
 import cat from '@/images/cat.jpg'
 import goat from '@/images/goat.jpg'
 const destination = "Amsterdam"
-
-
-// const content = computed(() => items.value[currentIndex.value])
 
 const fetchCatFact = async () => {
     try {
@@ -22,8 +19,9 @@ const fetchCatFact = async () => {
         }
 
         const data = await response.json()
-        catFacts.value = data
+        catFact.value = data[0]
         console.log('Cat facts:', data)
+        console.log(catFact.value)
 
     } catch (err) {
         console.error('Error fetching cat fact:', err)
@@ -32,7 +30,7 @@ const fetchCatFact = async () => {
 
 onMounted(fetchCatFact)
 
-const items = ref([
+const items = computed(() => [
     {
         type: "img",
         src: snake
@@ -47,12 +45,12 @@ const items = ref([
     },
     {
         type: "text",
-        src: catFacts.value[0]
+        content: catFact.value
     }
 ])
 
-const { currentIndex } = useContentRotator(items, 3000)
-
+// const { currentIndex } = useContentRotator(items, 3000)
+// const content = computed(() => items.value[currentIndex.value])
 
 const formatTime = (dateString) => {
     if (!dateString) return ''
@@ -62,8 +60,6 @@ const formatTime = (dateString) => {
         minute: '2-digit'
     })
 }
-
-
 
 // const fetchData = async () => {
 //     try {
@@ -129,7 +125,6 @@ console.log(trains)
             <audio ref="audioRef" controls autoplay :src="streamUrl"></audio>
         </div>
     </div>
-
 
 </template>
 
