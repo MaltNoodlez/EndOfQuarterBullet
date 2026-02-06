@@ -86,7 +86,9 @@ const fetchData = async () => {
     console.error('Error fetching train data:', err)
   }
 }
-
+const handleSubmit =()=>{
+    fetchData()
+}
 /* ================= INIT ================= */
 onMounted(() => {
   fetchData()
